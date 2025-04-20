@@ -21,3 +21,4 @@ env/
 *.gsheet
 
 processed-diabetes-data/
+diabetes-data/

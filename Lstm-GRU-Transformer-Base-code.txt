@@ -1,0 +1,374 @@
+# Lstm + GRU - Transformer attention mech
+
+import pandas as pd
+import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.preprocessing import RobustScaler
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, LSTM, GRU, Dense, Dropout, MultiHeadAttention, LayerNormalization, Flatten, concatenate
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+import matplotlib.pyplot as plt
+
+
+# Load processed data
+data = pd.read_csv('/content/drive/MyDrive/MINI01/merged-files/processed_data.csv')
+data['datetime'] = pd.to_datetime(data['datetime'])
+
+# Extract selected features and target (code 33 only)
+selected_glucose_codes = ['48', '58', '60', '62', '64']
+insulin_codes = ['33']
+target_columns = insulin_codes
+
+# Create time features
+def create_time_features(df):
+    df = df.copy()
+    df['hour_sin'] = np.sin(2 * np.pi * df['datetime'].dt.hour / 24)
+    df['hour_cos'] = np.cos(2 * np.pi * df['datetime'].dt.hour / 24)
+    df['weekday_sin'] = np.sin(2 * np.pi * df['datetime'].dt.weekday / 7)
+    df['weekday_cos'] = np.cos(2 * np.pi * df['datetime'].dt.weekday / 7)
+    hour = df['datetime'].dt.hour
+    df['morning'] = ((hour >= 6) & (hour < 10)).astype(int)
+    df['noon'] = ((hour >= 11) & (hour < 14)).astype(int)
+    df['evening'] = ((hour >= 17) & (hour < 21)).astype(int)
+    return df
+
+data = create_time_features(data)
+
+
+# Add glucose trend features
+data = data.sort_values(['patient_id', 'datetime']).reset_index(drop=True)
+def add_glucose_features(df, glucose_cols):
+    df = df.copy()
+    for col in glucose_cols:
+        df[f'{col}_lag1'] = df.groupby('patient_id')[col].shift(1).fillna(0)
+        df[f'{col}_lag2'] = df.groupby('patient_id')[col].shift(2).fillna(0)
+        df[f'{col}_present'] = (df[col] > 0).astype(int)
+        df[f'{col}_diff'] = df.groupby('patient_id')[col].diff().fillna(0)
+    return df
+
+data = add_glucose_features(data, selected_glucose_codes)
+
+
+
+# Add insulin history features for code 33 only
+def add_insulin_features(df, insulin_cols):
+    df = df.copy()
+    for col in insulin_cols:
+        df[f'{col}_used'] = (df[col] > 0).astype(int)
+        df[f'{col}_prev'] = df.groupby('patient_id')[col].shift(1).fillna(0)
+        df[f'{col}_prev2'] = df.groupby('patient_id')[col].shift(2).fillna(0)
+    return df
+
+data = add_insulin_features(data, insulin_codes)
+
+# Keep original data for plotting
+original_data = data[['patient_id', 'datetime']].copy()
+
+
+
+# Define feature columns
+feature_columns = (
+    selected_glucose_codes + [f'{col}_lag1' for col in selected_glucose_codes] +
+    [f'{col}_lag2' for col in selected_glucose_codes] + [f'{col}_diff' for col in selected_glucose_codes] +
+    [f'{col}_present' for col in selected_glucose_codes] + [f'{col}_prev' for col in insulin_codes] +
+    [f'{col}_prev2' for col in insulin_codes] + [f'{col}_used' for col in insulin_codes] +
+    ['hour_sin', 'hour_cos', 'weekday_sin', 'weekday_cos', 'morning', 'noon', 'evening']
+)
+data_for_model = data[['patient_id'] + feature_columns + insulin_codes]
+
+
+# Scale features and target
+def scale_features(df, feature_cols, target_cols):
+    df_scaled = df.copy()
+    feature_scaler = RobustScaler()
+    target_scaler = RobustScaler()
+    df_scaled[feature_cols] = feature_scaler.fit_transform(df[feature_cols])
+    df_scaled[target_cols] = target_scaler.fit_transform(df[target_cols])
+    return df_scaled, feature_scaler, target_scaler
+
+data_scaled, feature_scaler, target_scaler = scale_features(data_for_model, feature_columns, insulin_codes)
+
+
+
+# Stratified patient split
+def stratified_patient_split(data, insulin_cols, test_size=0.2, random_state=42):
+    patient_insulin = data.groupby('patient_id')[insulin_cols].mean().sum(axis=1)
+    sorted_patients = patient_insulin.sort_values().index.tolist()
+    n_patients = len(sorted_patients)
+    n_test = int(n_patients * test_size)
+    test_indices = list(range(0, n_patients, 5))[:n_test]
+    test_patients = [sorted_patients[i] for i in test_indices]
+    train_patients = [p for p in sorted_patients if p not in test_patients]
+    test_patients_filtered = []
+    min_non_zero_ratio = 0.1
+    for pid in test_patients:
+        non_zero_ratio = (data[data['patient_id'] == pid]['33'] > 0).mean()
+        if non_zero_ratio >= min_non_zero_ratio:
+            test_patients_filtered.append(pid)
+        else:
+            train_patients.append(pid)
+    return train_patients, test_patients_filtered
+
+train_patients, test_patients_filtered = stratified_patient_split(data, insulin_codes)
+
+
+
+# Sequence creation with timestamps
+def create_sequences_per_patient(data, patient_ids, seq_length, feature_indices, target_index):
+    X, y, time_indices = [], [], []
+    patient_index_map = {}
+    start_idx = 0
+    for patient_id in patient_ids:
+        patient_data = data[data['patient_id'] == patient_id].drop(columns=['patient_id']).values
+        patient_times = original_data[original_data['patient_id'] == patient_id]['datetime'].values
+        num_sequences = len(patient_data) - seq_length
+        if num_sequences > 0:
+            patient_index_map[patient_id] = np.arange(start_idx, start_idx + num_sequences)
+            for i in range(num_sequences):
+                X.append(patient_data[i:i + seq_length, feature_indices])
+                y.append(patient_data[i + seq_length, target_index])
+                time_indices.append(patient_times[i + seq_length])
+            start_idx += num_sequences
+    return np.array(X), np.array(y), np.array(time_indices), patient_index_map
+
+
+
+# Create sequences
+SEQ_LENGTH = 4
+feature_indices = [data_scaled.columns.get_loc(col) - 1 for col in feature_columns]
+target_index = data_scaled.columns.get_loc('33') - 1
+X_train, y_train, _, _ = create_sequences_per_patient(data_scaled, train_patients, SEQ_LENGTH, feature_indices, target_index)
+X_test, y_test, test_times, patient_index_map = create_sequences_per_patient(data_scaled, test_patients_filtered, SEQ_LENGTH, feature_indices, target_index)
+
+
+
+# Define LSTM-Transformer Model
+def build_lstm_transformer_model(input_shape, num_heads=4, ff_dim=64, dropout_rate=0.2):
+    inputs = Input(shape=input_shape)
+    lstm_out = LSTM(256, return_sequences=True)(inputs)
+    lstm_out = Dropout(dropout_rate)(lstm_out)
+    lstm_out = LSTM(64, return_sequences=True)(lstm_out)
+    lstm_out = Dropout(dropout_rate)(lstm_out)
+    attention_out = MultiHeadAttention(num_heads=num_heads, key_dim=64)(lstm_out, lstm_out)
+    attention_out = Dropout(dropout_rate)(attention_out)
+    attention_out = LayerNormalization(epsilon=1e-6)(attention_out + lstm_out)
+    ff_out = Dense(ff_dim, activation='relu')(attention_out)
+    ff_out = Dropout(dropout_rate)(ff_out)
+    ff_out = Dense(64, activation='relu')(ff_out)
+    transformer_out = LayerNormalization(epsilon=1e-6)(attention_out + ff_out)
+    flat_out = Flatten()(transformer_out)
+    dense_out = Dense(64, activation='relu')(flat_out)
+    dense_out = Dropout(dropout_rate)(dense_out)
+    outputs = Dense(1)(dense_out)
+    model = Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
+    return model
+
+
+
+# Define GRU-Transformer Model
+def build_gru_transformer_model(input_shape, num_heads=4, ff_dim=64, dropout_rate=0.2):
+    inputs = Input(shape=input_shape)
+    gru_out = GRU(256, return_sequences=True)(inputs)
+    gru_out = Dropout(dropout_rate)(gru_out)
+    gru_out = GRU(64, return_sequences=True)(gru_out)
+    gru_out = Dropout(dropout_rate)(gru_out)
+    attention_out = MultiHeadAttention(num_heads=num_heads, key_dim=64)(gru_out, gru_out)
+    attention_out = Dropout(dropout_rate)(attention_out)
+    attention_out = LayerNormalization(epsilon=1e-6)(attention_out + gru_out)
+    ff_out = Dense(ff_dim, activation='relu')(attention_out)
+    ff_out = Dropout(dropout_rate)(ff_out)
+    ff_out = Dense(64, activation='relu')(ff_out)
+    transformer_out = LayerNormalization(epsilon=1e-6)(attention_out + ff_out)
+    flat_out = Flatten()(transformer_out)
+    dense_out = Dense(64, activation='relu')(flat_out)
+    dense_out = Dropout(dropout_rate)(dense_out)
+    outputs = Dense(1)(dense_out)
+    model = Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
+    return model
+
+
+# Model parameters
+input_shape = (SEQ_LENGTH, len(feature_columns))
+
+# Train base models
+lstm_model = build_lstm_transformer_model(input_shape)
+gru_model = build_gru_transformer_model(input_shape)
+
+callbacks = [
+    EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True),
+    ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=10, min_lr=1e-6)
+]
+
+
+
+# Train LSTM-Transformer
+lstm_history = lstm_model.fit(
+    X_train, y_train,
+    validation_data=(X_test, y_test),
+    epochs=100,
+    batch_size=32,
+    callbacks=callbacks,
+    verbose=1
+)
+
+
+
+# Train GRU-Transformer
+gru_history = gru_model.fit(
+    X_train, y_train,
+    validation_data=(X_test, y_test),
+    epochs=100,
+    batch_size=32,
+    callbacks=callbacks,
+    verbose=1
+)
+
+
+# Generate predictions from base models
+lstm_pred_train = lstm_model.predict(X_train)
+gru_pred_train = gru_model.predict(X_train)
+lstm_pred_test = lstm_model.predict(X_test)
+gru_pred_test = gru_model.predict(X_test)
+
+# Stack predictions for meta-model
+X_meta_train = np.concatenate([lstm_pred_train, gru_pred_train], axis=1)
+X_meta_test = np.concatenate([lstm_pred_test, gru_pred_test], axis=1)
+
+
+
+# Define and train meta-model
+def build_meta_model(input_dim):
+    inputs = Input(shape=(input_dim,))
+    x = Dense(32, activation='relu')(inputs)
+    x = Dropout(0.2)(x)
+    x = Dense(16, activation='relu')(x)
+    outputs = Dense(1)(x)
+    model = Model(inputs=inputs, outputs=outputs)
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='mse', metrics=['mae'])
+    return model
+
+meta_model = build_meta_model(input_dim=X_meta_train.shape[1])
+
+
+
+meta_history = meta_model.fit(
+    X_meta_train, y_train,
+    validation_split=0.2,
+    epochs=50,
+    batch_size=32,
+    callbacks=callbacks,
+    verbose=1
+)
+
+
+# Final prediction
+y_pred_scaled = meta_model.predict(X_meta_test)
+y_test_unscaled = target_scaler.inverse_transform(y_test.reshape(-1, 1))
+y_pred_unscaled = target_scaler.inverse_transform(y_pred_scaled)
+
+# Evaluate
+mae = mean_absolute_error(y_test_unscaled, y_pred_unscaled)
+mse = mean_squared_error(y_test_unscaled, y_pred_unscaled)
+r2 = r2_score(y_test_unscaled, y_pred_unscaled)
+
+print(f"Mean Absolute Error (MAE): {mae:.4f}")
+print(f"Mean Squared Error (MSE): {mse:.4f}")
+print(f"R² Score: {r2:.4f}")
+
+
+# Plot training history for meta-model
+plt.figure(figsize=(12, 4))
+plt.subplot(1, 2, 1)
+plt.plot(meta_history.history['loss'], label='Train Loss')
+plt.plot(meta_history.history['val_loss'], label='Validation Loss')
+plt.title('Meta-Model Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.subplot(1, 2, 2)
+plt.plot(meta_history.history['mae'], label='Train MAE')
+plt.plot(meta_history.history['val_mae'], label='Validation MAE')
+plt.title('Meta-Model MAE')
+plt.xlabel('Epoch')
+plt.ylabel('MAE')
+plt.legend()
+plt.show()
+
+
+# Plotting function for a specific patient
+def plot_weekly_actual_vs_predicted_for_patient(y_test, y_pred, test_times, patient_id, patient_index_map):
+    """
+    Plot actual vs predicted insulin usage for a specific patient as bar charts, one week per graph,
+    until all test data for the patient is plotted.
+
+    Parameters:
+    - y_test: Array of actual insulin values (unscaled).
+    - y_pred: Array of predicted insulin values (unscaled).
+    - test_times: Array of timestamps corresponding to test predictions.
+    - patient_id: ID of the patient to plot.
+    - patient_index_map: Dictionary mapping patient IDs to their sequence indices in the test set.
+    """
+    patient_indices = patient_index_map.get(patient_id, [])
+    if not patient_indices.size:
+        print(f"No data found for Patient {patient_id}")
+        return
+
+    # Extract patient-specific data and ensure 1D arrays
+    patient_actual = y_test[patient_indices].ravel()  # Flatten to 1D
+    patient_predicted = y_pred[patient_indices].ravel()  # Flatten to 1D
+    patient_times = test_times[patient_indices]
+
+    # Sort by time
+    sorted_indices = np.argsort(patient_times)
+    patient_times = patient_times[sorted_indices]
+    patient_actual = patient_actual[sorted_indices]
+    patient_predicted = patient_predicted[sorted_indices]
+
+    # Define weekly intervals
+    start_date = pd.Timestamp(patient_times.min())
+    end_date = start_date + pd.Timedelta(days=7)
+
+    # Plot each week until all data is covered
+    while start_date < patient_times.max():
+        mask = (patient_times >= start_date) & (patient_times < end_date)
+        week_times = patient_times[mask]
+
+        if len(week_times) == 0:
+            start_date += pd.Timedelta(days=7)
+            end_date += pd.Timedelta(days=7)
+            continue
+
+        week_actual = patient_actual[mask]
+        week_predicted = patient_predicted[mask]
+
+        # Create bar plot
+        plt.figure(figsize=(12, 6))
+        bar_width = 0.35
+        x = np.arange(len(week_times))
+        plt.bar(x - bar_width/2, week_actual, bar_width, label='Actual Insulin (Code 33)', color='blue', alpha=0.7)
+        plt.bar(x + bar_width/2, week_predicted, bar_width, label='Predicted Insulin (Code 33)', color='red', alpha=0.7)
+
+        # Customize plot
+        plt.xlabel('Time')
+        plt.ylabel('Insulin Dose (Units)')
+        plt.title(f'Actual vs Predicted Insulin for Patient {patient_id} - '
+                  f'{start_date.date()} to {end_date.date()}')
+        plt.xticks(x, [t.strftime('%Y-%m-%d %H:%M') for t in week_times], rotation=45)
+        plt.legend()
+        plt.grid(True, linestyle='--', alpha=0.5)
+        plt.tight_layout()
+
+        # Display plot
+        plt.show()
+
+        # Move to next week
+        start_date += pd.Timedelta(days=7)
+        end_date += pd.Timedelta(days=7)
+
+# Example usage: specify a patient ID from test_patients_filtered
+specific_patient_id = test_patients_filtered[0]  # Change this to the desired patient ID, e.g., test_patients_filtered[4]
+plot_weekly_actual_vs_predicted_for_patient(y_test_unscaled, y_pred_unscaled, test_times, specific_patient_id, patient_index_map)
