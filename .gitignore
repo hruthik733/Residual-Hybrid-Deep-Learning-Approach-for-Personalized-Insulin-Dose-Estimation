@@ -1,0 +1,23 @@
+ECHO is on.
+# Python
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints
+
+# Environment
+venv/
+env/
+
+# Data
+*.csv
+*.zip
+*.h5
+*.pth
+*.pt
+.DS_Store
+
+# Google Drive
+*.gdoc
+*.gsheet
+
+processed-diabetes-data/
