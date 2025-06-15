@@ -78,10 +78,10 @@ Our hybrid model consists of stacked LSTM and GRU layers followed by dense layer
 
 ## 🔭 Future Work
 
-- **Multi-output Prediction**: Extend to predict other insulin types (e.g., NPH, UltraLente).
-- **Attention Mechanism**: Introduce Transformer or attention layers for better interpretability and performance.
-- **Cross-Dataset Testing**: Validate the model on other real-world diabetes datasets.
-- **Deployment**: Package the solution into a web app using Flask or Django for clinical testing and real-world usability.
+- **Multi-output Prediction**: Extend the model to predict additional insulin types such as NPH and UltraLente.
+- **Reinforcement Learning Integration**: Incorporate reinforcement learning to enable adaptive insulin dosage strategies based on real-time glucose response and patient history.
+- **Attention Mechanisms**: Integrate attention or Transformer-based layers to enhance interpretability and focus on influential time steps.
+- **Cross-Dataset Testing**: Evaluate the model on additional diabetes datasets to improve robustness and generalization.
 
 ---
 
