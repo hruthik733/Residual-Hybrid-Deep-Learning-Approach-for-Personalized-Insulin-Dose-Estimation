@@ -24,11 +24,12 @@ This project focuses on predicting personalized regular insulin dosages for diab
 - Contribute toward building personalized decision-support tools in diabetic care.
 
 ---
-
 ## 🧪 Preprocessing Pipeline
 
-- **Data Cleaning**: Handled missing values, removed irrelevant codes, and standardized timestamp formats.
-- **Event Pivoting**: Transformed AIM94 dataset event codes into structured columns for:
+To convert the raw AIM94 event-based logs into a model-ready time-series dataset, we performed the following steps:
+
+- **Data Cleaning**: Removed irrelevant codes, handled missing values, and standardized date-time formats.
+- **Event Pivoting**: Transformed event codes into structured columns like:
   - Glucose
   - Insulin types (Regular, NPH, UltraLente)
   - Food Intake
@@ -37,10 +38,24 @@ This project focuses on predicting personalized regular insulin dosages for diab
 - **Feature Engineering**:
   - Cyclic encoding for time-of-day (sine/cosine of Hour and Minute)
   - Lag features for past glucose and insulin values
-  - Temporal indicators (morning/afternoon/evening)
-  - Binary flags for event occurrence (food, exercise, symptoms)
-- **Sequence Generation**: Formed multivariate input sequences of fixed window length with corresponding target outputs for next-step insulin dosage prediction.
-- **Normalization**: Applied Min-Max scaling to all continuous variables to improve convergence during training.
+  - Temporal indicators (e.g., morning/afternoon/evening)
+  - Binary event flags for food, exercise, symptoms
+- **Sequence Generation**: Created multivariate input sequences using a sliding window to forecast the next insulin dose.
+- **Normalization**: Applied Min-Max scaling to continuous features for better model convergence.
+
+### 🔁 Raw to Processed Data Example
+
+To help understand the transformation, below are visual examples showing how raw event records are converted into processed time-series input:
+
+**Table 3.1. Raw Event-Based Data**
+
+![Raw Data Table](https://github.com/user-attachments/assets/6b8eaabc-be88-4a0b-ae0c-20b55ece920c)
+
+**Table 3.2. Processed Time-Series Data**
+
+![Processed Data Table](https://github.com/user-attachments/assets/83134b8e-36d2-4c4d-a54c-9d3105cb2e08)
+
+These transformations were key to structuring the input sequences used by the hybrid LSTM-GRU model.
 
 ---
 
