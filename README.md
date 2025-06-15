@@ -46,4 +46,6 @@ This project focuses on predicting personalized regular insulin dosages for diab
 ## 🏗️ Model Architecture
 
 Our hybrid model consists of stacked LSTM and GRU layers followed by dense layers to predict insulin dosage:
+![image](https://github.com/user-attachments/assets/31c96ea4-9e36-4a85-bb1a-42362e52eddf)
+
 
