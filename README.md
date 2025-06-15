@@ -49,4 +49,17 @@ This project focuses on predicting personalized regular insulin dosages for diab
 Our hybrid model consists of stacked LSTM and GRU layers followed by dense layers to predict insulin dosage:
 ![image](https://github.com/user-attachments/assets/31c96ea4-9e36-4a85-bb1a-42362e52eddf)
 
+## 🔭 Future Work
+
+- **Multi-output Prediction**: Extend to predict other insulin types (e.g., NPH, UltraLente).
+- **Attention Mechanism**: Introduce Transformer or attention layers for better interpretability and performance.
+- **Cross-Dataset Testing**: Validate the model on other real-world diabetes datasets.
+- **Deployment**: Package the solution into a web app using Flask or Django for clinical testing and real-world usability.
+
+---
+
+## 📌 Final Hybrid Model
+
+The final model integrates both LSTM and GRU units and processes patient sequences to predict personalized insulin dosage.You can check it out here:https://drive.google.com/file/d/10JspsXdBGk9TsfWnc3f7zO8Rk5nA15hW/view?usp=sharing
+
 
