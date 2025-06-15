@@ -60,6 +60,7 @@ Our hybrid model consists of stacked LSTM and GRU layers followed by dense layer
 
 ## 📌 Final Hybrid Model
 
-The final model integrates both LSTM and GRU units and processes patient sequences to predict personalized insulin dosage.You can check it out here:https://drive.google.com/file/d/10JspsXdBGk9TsfWnc3f7zO8Rk5nA15hW/view?usp=sharing
+The final model integrates both LSTM and GRU units and processes patient sequences to predict personalized insulin dosage.You can check it out here:
+[Hybrid Model](https://drive.google.com/file/d/10JspsXdBGk9TsfWnc3f7zO8Rk5nA15hW/view?usp=sharing).
 
 
