@@ -45,17 +45,29 @@ To convert the raw AIM94 event-based logs into a model-ready time-series dataset
 
 ### 🔁 Raw to Processed Data Example
 
-To help understand the transformation, below are visual examples showing how raw event records are converted into processed time-series input:
+To help understand the transformation, below is a visual comparison of how raw event-based logs are transformed into structured time-series records for modeling.
 
-**Table 3.1. Raw Event-Based Data**
+<div align="center">
 
-![Raw Data Table](https://github.com/user-attachments/assets/a9ff9fd5-4cda-4f1f-901e-230de855933a)
+<table>
+  <tr>
+    <td align="center"><strong>Table 3.1: Raw Event-Based Data</strong></td>
+    <td></td>
+    <td align="center"><strong>Table 3.2: Processed Time-Series Data</strong></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/a9ff9fd5-4cda-4f1f-901e-230de855933a" width="360"/></td>
+    <td align="center" style="vertical-align: middle;">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Arrow_right.svg/1024px-Arrow_right.svg.png" width="60"/>
+    </td>
+    <td><img src="https://github.com/user-attachments/assets/d4b6eccb-2697-4c4d-9821-d0f557c649aa" width="460"/></td>
+  </tr>
+</table>
 
-**Table 3.2. Processed Time-Series Data**
-
-![Processed Data Table](https://github.com/user-attachments/assets/d4b6eccb-2697-4c4d-9821-d0f557c649aa)
+</div>
 
 These transformations were key to structuring the input sequences used by the hybrid LSTM-GRU model.
+
 
 ---
 
