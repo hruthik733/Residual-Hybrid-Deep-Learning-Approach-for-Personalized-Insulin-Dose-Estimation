@@ -58,7 +58,7 @@ To help understand the transformation, below is a visual comparison of how raw e
   <tr>
     <td><img src="https://github.com/user-attachments/assets/a9ff9fd5-4cda-4f1f-901e-230de855933a" width="360"/></td>
     <td align="center" style="vertical-align: middle;">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Arrow_right.svg/1024px-Arrow_right.svg.png" width="60"/>
+      <img src="https://e7.pngegg.com/pngimages/856/761/png-clipart-arrow-free-content-arrow-pointing-left-angle-rectangle.png" width="60"/>
     </td>
     <td><img src="https://github.com/user-attachments/assets/d4b6eccb-2697-4c4d-9821-d0f557c649aa" width="460"/></td>
   </tr>
