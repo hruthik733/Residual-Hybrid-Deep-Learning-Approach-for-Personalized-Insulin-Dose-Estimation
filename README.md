@@ -49,11 +49,11 @@ To help understand the transformation, below are visual examples showing how raw
 
 **Table 3.1. Raw Event-Based Data**
 
-![Raw Data Table](https://github.com/user-attachments/assets/6b8eaabc-be88-4a0b-ae0c-20b55ece920c)
+![Raw Data Table](https://github.com/user-attachments/assets/a9ff9fd5-4cda-4f1f-901e-230de855933a)
 
 **Table 3.2. Processed Time-Series Data**
 
-![Processed Data Table](https://github.com/user-attachments/assets/83134b8e-36d2-4c4d-a54c-9d3105cb2e08)
+![Processed Data Table](https://github.com/user-attachments/assets/d4b6eccb-2697-4c4d-9821-d0f557c649aa)
 
 These transformations were key to structuring the input sequences used by the hybrid LSTM-GRU model.
 
