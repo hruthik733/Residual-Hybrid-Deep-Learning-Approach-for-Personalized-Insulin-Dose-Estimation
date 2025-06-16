@@ -1,4 +1,3 @@
-![actual_vs_predicted_patient_22_week_0](https://github.com/user-attachments/assets/74e9812c-495a-4f20-bfc6-f87445852eb7)
 # Personalized Insulin Dosage Prediction Using Hybrid LSTM-GRU Model
 
 ## 🧠 Project Overview
