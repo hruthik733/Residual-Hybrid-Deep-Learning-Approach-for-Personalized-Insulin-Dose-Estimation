@@ -1,3 +1,4 @@
+![image](https://github.com/user-attachments/assets/cb878e26-ad5a-4d3d-bb03-73e74a0437f5)
 # Personalized Insulin Dosage Prediction Using Hybrid LSTM-GRU Model
 
 ## 🧠 Project Overview
