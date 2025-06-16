@@ -1,9 +1,0 @@
-Stacking Ensemble (LSTM+GRU+XGBoost) Metrics:
-MAE: 3.4449
-MSE: 17.4407
-R²: -0.0764
-
-Individual Model R² Scores:
-LSTM-Transformer: 0.4278
-GRU-Transformer: 0.4426
-XGBoost: 0.5358
