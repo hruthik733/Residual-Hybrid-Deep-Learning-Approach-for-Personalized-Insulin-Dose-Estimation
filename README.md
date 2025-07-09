@@ -44,7 +44,7 @@ To convert the raw AIM94 event-based logs into a model-ready time-series dataset
 - **Normalization**: Applied Min-Max scaling to continuous features for better model convergence.
 
 ### 🔁 Raw to Processed Data Example
-RAM Dataset Available at : https://archive.ics.uci.edu/dataset/34/diabetes
+AIM94 RAM Dataset Available at : https://archive.ics.uci.edu/dataset/34/diabetes
 
 To help understand the transformation, below is a visual comparison of how raw event-based logs are transformed into structured time-series records for modeling.
 
