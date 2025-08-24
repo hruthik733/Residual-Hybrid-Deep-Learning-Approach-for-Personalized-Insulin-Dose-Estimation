@@ -77,6 +77,12 @@ These transformations were key to structuring the input sequences used by the hy
 Our baseline Hybrid LSTM-GRU model consists of stacked LSTM and GRU layers followed by dense layers. The Residual Sequence Learning Model extends this by adding residual connections between recurrent blocks, along with normalization and dropout, to improve learning stability and accuracy.
 <img width="971" height="689" alt="Architecture (2)" src="https://github.com/user-attachments/assets/d1efc10b-dec6-485b-b0f4-0d28330fc2f6" />
 
+## ⚙️ Algorithm
+
+The following summarizes the Residual Hybrid Network for Insulin Dose Prediction:
+<div align="center"> <img width="1273" height="747" alt="image" src="https://github.com/user-attachments/assets/b47e08d3-2884-466e-8806-a108f8bbdde8" />
+
+
 ## 📊 Results and Performance
 We compared the proposed model with baseline architectures.
 <img width="655" height="198" alt="image" src="https://github.com/user-attachments/assets/49db5e3c-e6e3-4701-a86c-172c51c03765" />
