@@ -3,16 +3,16 @@
 
 ## 🧠 Project Overview
 
-This project focuses on predicting personalized regular insulin dosages for diabetic patients using a hybrid deep learning model combining Long Short-Term Memory (LSTM) and Gated Recurrent Unit (GRU) layers. Leveraging the **AIM94 diabetes management dataset**, the model utilizes temporal glucose readings, food intake, and physiological event data to capture individual patterns in insulin requirements. Through comprehensive preprocessing and time-sequence modeling, the system aims to assist in personalized diabetes care by providing accurate insulin dose recommendations.
+This project presents a Residual Hybrid Deep Learning Model for predicting personalized regular insulin dosages in diabetic patients. The architecture integrates LSTM and GRU layers with residual connections, enabling the model to capture both short-term fluctuations and long-term glucose–insulin dependencies. Using the AIM94 dataset, advanced preprocessing and temporal feature engineering were applied to transform event-based logs into model-ready time-series data.
 
 ---
 
 ## 🔑 Key Highlights
 
-- **Hybrid LSTM-GRU Architecture**: Integrates both LSTM and GRU layers to effectively capture short- and long-term dependencies in patient glucose-insulin dynamics.
+- **Residual Hybrid Architecture**: Combines LSTM and GRU blocks with skip/residual connections to improve gradient flow and learning stability.
 - **Raw Data Preprocessing**: Transforms the raw AIM94 event-based logs into a usable time-series format by pivoting codes, encoding time features cyclically, and generating lagged variables.
 - **Time Window Sequence Modeling**: Generates input sequences using a sliding window approach to feed multivariate time-series data into the model.
-- **Clinical Impact**: Aims to provide a data-driven support system for insulin dose planning, improving glycemic control and reducing the risk of hypo/hyperglycemia in real-world scenarios.
+- **Performance Improvement**: Achieved R² = 0.805, MAE = 1.29, MSE = 3.27, representing a ~30% improvement in R² and >60% reduction in MSE compared to baseline models.
 
 ---
 
@@ -75,7 +75,8 @@ These transformations were key to structuring the input sequences used by the hy
 ## 🏗️ Model Architecture
 
 Our hybrid model consists of stacked LSTM and GRU layers followed by dense layers to predict insulin dosage:
-![image](https://github.com/user-attachments/assets/31c96ea4-9e36-4a85-bb1a-42362e52eddf)
+<img width="971" height="689" alt="Architecture (2)" src="https://github.com/user-attachments/assets/d1efc10b-dec6-485b-b0f4-0d28330fc2f6" />
+
 
 ## 🔭 Future Work
 
