@@ -80,12 +80,12 @@ Our baseline Hybrid LSTM-GRU model consists of stacked LSTM and GRU layers follo
 ## ⚙️ Algorithm
 
 The following summarizes the Residual Hybrid Network for Insulin Dose Prediction:
-<div align="center"> <img width="1273" height="747" alt="image" src="https://github.com/user-attachments/assets/b47e08d3-2884-466e-8806-a108f8bbdde8" />
+<div align="center"> <img width="1273" height="747" alt="image" src="https://github.com/user-attachments/assets/b47e08d3-2884-466e-8806-a108f8bbdde8" /></div>
 
 
 ## 📊 Results and Performance
 We compared the proposed model with baseline architectures.
-<img width="655" height="198" alt="image" src="https://github.com/user-attachments/assets/49db5e3c-e6e3-4701-a86c-172c51c03765" />
+<div align="center"><img width="655" height="198" alt="image" src="https://github.com/user-attachments/assets/49db5e3c-e6e3-4701-a86c-172c51c03765" /></div>
 ➡️ The Residual Sequence Learning Model improved R² from 0.52–0.62 (baselines) to 0.805, while reducing MAE by ~10% and MSE by ~60%.
 
 
