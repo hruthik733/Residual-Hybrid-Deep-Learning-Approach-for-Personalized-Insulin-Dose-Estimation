@@ -74,8 +74,14 @@ These transformations were key to structuring the input sequences used by the hy
 
 ## 🏗️ Model Architecture
 
-Our hybrid model consists of stacked LSTM and GRU layers followed by dense layers to predict insulin dosage:
+Our baseline Hybrid LSTM-GRU model consists of stacked LSTM and GRU layers followed by dense layers. The Residual Sequence Learning Model extends this by adding residual connections between recurrent blocks, along with normalization and dropout, to improve learning stability and accuracy.
 <img width="971" height="689" alt="Architecture (2)" src="https://github.com/user-attachments/assets/d1efc10b-dec6-485b-b0f4-0d28330fc2f6" />
+
+## 📊 Results and Performance
+We compared the proposed model with baseline architectures.
+<img width="655" height="198" alt="image" src="https://github.com/user-attachments/assets/49db5e3c-e6e3-4701-a86c-172c51c03765" />
+➡️ The Residual Sequence Learning Model improved R² from 0.52–0.62 (baselines) to 0.805, while reducing MAE by ~10% and MSE by ~60%.
+
 
 
 ## 🔭 Future Work
