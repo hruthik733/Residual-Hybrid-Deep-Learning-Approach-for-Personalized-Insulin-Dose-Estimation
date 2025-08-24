@@ -85,7 +85,7 @@ The following summarizes the Residual Hybrid Network for Insulin Dose Prediction
 
 ## 📊 Results and Performance
 We compared the proposed model with baseline architectures.
-<div align="center"> <img width="655" height="198" alt="image" src="https://github.com/user-attachments/assets/49db5e3c-e6e3-4701-a86c-172c51c03765" />
+<img width="655" height="198" alt="image" src="https://github.com/user-attachments/assets/49db5e3c-e6e3-4701-a86c-172c51c03765" />
 ➡️ The Residual Sequence Learning Model improved R² from 0.52–0.62 (baselines) to 0.805, while reducing MAE by ~10% and MSE by ~60%.
 
 
