@@ -1,4 +1,3 @@
-![image](https://github.com/user-attachments/assets/cb878e26-ad5a-4d3d-bb03-73e74a0437f5)
 # Personalized Insulin Dosage Prediction Using Hybrid LSTM-GRU Model
 
 <p align="center">
@@ -10,6 +9,8 @@
   <img src="https://img.shields.io/badge/Dataset-AIM94%20(UCI)-lightgrey"/>
   <img src="https://img.shields.io/badge/R²%20Score-0.805-brightgreen"/>
 </p>
+![image](https://github.com/user-attachments/assets/cb878e26-ad5a-4d3d-bb03-73e74a0437f5)
+
 
 ## 🧠 Project Overview
 
