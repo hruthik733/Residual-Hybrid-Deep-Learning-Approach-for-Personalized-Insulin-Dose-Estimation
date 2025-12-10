@@ -1,6 +1,16 @@
 ![image](https://github.com/user-attachments/assets/cb878e26-ad5a-4d3d-bb03-73e74a0437f5)
 # Personalized Insulin Dosage Prediction Using Hybrid LSTM-GRU Model
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.8%2B-blue"/>
+  <img src="https://img.shields.io/badge/TensorFlow-2.x-orange"/>
+  <img src="https://img.shields.io/badge/Keras-Deep%20Learning-red"/>
+  <img src="https://img.shields.io/badge/Architecture-Hybrid%20LSTM--GRU-yellow"/>
+  <img src="https://img.shields.io/badge/Technique-Residual%20Connections-blueviolet"/>
+  <img src="https://img.shields.io/badge/Dataset-AIM94%20(UCI)-lightgrey"/>
+  <img src="https://img.shields.io/badge/R²%20Score-0.805-brightgreen"/>
+</p>
+
 ## 🧠 Project Overview
 
 This project presents a Residual Hybrid Deep Learning Model for predicting personalized regular insulin dosages in diabetic patients. The architecture integrates LSTM and GRU layers with residual connections, enabling the model to capture both short-term fluctuations and long-term glucose–insulin dependencies. Using the AIM94 dataset, advanced preprocessing and temporal feature engineering were applied to transform event-based logs into model-ready time-series data.
