@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Dataset-AIM94%20(UCI)-lightgrey"/>
   <img src="https://img.shields.io/badge/R²%20Score-0.805-brightgreen"/>
 </p>
-![image](https://github.com/user-attachments/assets/cb878e26-ad5a-4d3d-bb03-73e74a0437f5)
+<img width="1200" height="600" alt="image" src="https://github.com/user-attachments/assets/4a4cffa1-3bbd-4bbc-b6ce-ddfb62634ce2" />
 
 
 ## 🧠 Project Overview
