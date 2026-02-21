@@ -115,4 +115,40 @@ We compared the proposed model with baseline architectures.
 The final model integrates both LSTM and GRU units and processes patient sequences to predict personalized insulin dosage.You can check it out here:
 [Hybrid Model](https://drive.google.com/file/d/10JspsXdBGk9TsfWnc3f7zO8Rk5nA15hW/view?usp=sharing).
 
+## 📄 Publication & Citation
 
+<p align="center">
+  <a href="https://doi.org/10.1109/iSSSC66652.2025.11388159">
+    <img src="https://img.shields.io/badge/Published%20In-IEEE-blue" />
+  </a>
+  <img src="https://img.shields.io/badge/Conference-iSSSC%202025-darkgreen" />
+  <img src="https://img.shields.io/badge/DOI-10.1109/iSSSC66652.2025.11388159-orange" />
+</p>
+
+This research work has been officially published in the proceedings of the  
+**2025 IEEE 3rd International Symposium on Sustainable Energy, Signal Processing and Cybersecurity (iSSSC 2025).**
+
+### 📝 Paper Title  
+**Residual Hybrid Deep Learning Approach for Personalized Insulin Dose Estimation**
+
+### 👨‍💻 Authors  
+Hruthik Krishna Pavarala, Kalyani Gadupudi, Sudhamsh Maganti
+
+🔗 **DOI:** https://doi.org/10.1109/iSSSC66652.2025.11388159  
+
+---
+
+### 📚 Citation
+
+```bibtex
+@INPROCEEDINGS{11388159,
+  author={Pavarala, Hruthik Krishna and Gadupudi, Kalyani and Maganti, Sudhamsh},
+  booktitle={2025 IEEE 3rd International Symposium on Sustainable Energy, Signal Processing and Cybersecurity (iSSSC)},
+  title={Residual Hybrid Deep Learning Approach for Personalized Insulin Dose Estimation},
+  year={2025},
+  pages={1-6},
+  doi={10.1109/iSSSC66652.2025.11388159}
+}
+```
+
+⭐ If you use this repository in your research, please consider citing our work.
